@@ -12,8 +12,22 @@ from app.models import order, shops
 def createShop(request):
 
     if request.session.get("user_id")==None:
-        return HttpResponse("未登录")
-
+        post_data=request.POST;
+        shops.objects.create(price=post_data.get("price"),
+        title=post_data.get("title"),
+        content=post_data.get("content"),
+        seller_id="1",
+        imgUrl=post_data.get("imgUrl"),
+        )
+        return HttpResponse("成功")
+    else:
+        post_data=request.POST;
+        shops.objects.create(price=request.POST.get("price"),
+        title=post_data.get("title"),
+        content=post_data.get("content"),
+        seller_id=request.session.get("user_id"),
+        imgUrl=request.get("imgUrl"),
+        )
     return HttpResponse("awdaw")
 
 
@@ -42,11 +56,12 @@ def storeList(request):
     shopList= shops.objects.all()
     i=0
     data={}
+
     for shop in shopList:
         data[i]={
-            'shop_id':shop.shop_id,
+            'shop_id':shop.id,
             'price':shop.price,
-            'imgUrl':shop.imgUrl,
+            'imgUrl':str(shop.imgUrl).split(',')[0],
             'title':shop.title,
             'seller_id':shop.seller_id,
             'sellerImg':"",
@@ -62,14 +77,16 @@ def storeList(request):
     }
     return HttpResponse(json.dumps(redata, indent=4))
 
+
+
 def shopDetailed(request):
     id= request.POST.get("id")
-    shopList= shops.objects.get(shop_id=id)
+    shopList= shops.objects.get(id=id)
     print(shopList)
     data={
-            'shop_id':shopList.shop_id,
+            'shop_id':shopList.id,
             'price':shopList.price,
-            'imgUrl':shopList.imgUrl,
+            'imgUrl':str(shopList.imgUrl).split(','),
             'title':shopList.title,
             'seller_name':'超级废品家',
             'sellerImg':"",
@@ -87,9 +104,6 @@ def shopDetailed(request):
 
 
 def add_img(request):
-
-
-
     if request.method == 'POST':
         files = request.FILES.getlist('file')  # 获取
         # 储存
@@ -104,17 +118,18 @@ def add_img(request):
             t = int(round(t * 1000))  # 毫秒
             file_name = str(t) + os.path.splitext(fs.name)[1]
             print(file_name)
-            filename = os.path.join(settings.MEDIA_ROOT, 'img', file_name)
-            urllist[i] = '/media/img/' + filename
+            filename="media/img/"+file_name
+            urllist[i] = filename
             i=i+1
             print(i)
-            with open(filename, 'wb') as f:
+            with open('app/'+filename, 'wb') as f:
                 data = fs.file.read()
                 f.write(data)
-
         redata = {
                 'code': 200,
                 'msg':'上传成功',
                 'url':urllist
             }
         return HttpResponse(json.dumps(redata, indent=4))
+
+

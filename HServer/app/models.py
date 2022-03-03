@@ -3,7 +3,7 @@ from matplotlib.pyplot import cla
 
 class order(models.Model):
 
-    order_id=models.IntegerField(primary_key=True , null=False)
+
     orderDate=models.DateField(auto_now_add=True)
     orderState=models.IntegerField(default=0)
 
@@ -18,7 +18,7 @@ class order(models.Model):
     buyers_id=models.CharField(max_length=256,null=False)
 
 class shops(models.Model):
-    shop_id=models.IntegerField(primary_key=True,null=False)
+
     crdate=models.DateField(auto_now_add=True)
     price=models.CharField(max_length=256,null=False)
     imgUrl=models.CharField(max_length=256,null=False)
