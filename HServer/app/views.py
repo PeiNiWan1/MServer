@@ -10,44 +10,70 @@ from HServer import settings
 from app.models import order, shops
 
 def createShop(request):
-
     if request.session.get("user_id")==None:
-        post_data=request.POST;
+        post_data=request.POST
         shops.objects.create(price=post_data.get("price"),
         title=post_data.get("title"),
         content=post_data.get("content"),
         seller_id="1",
         imgUrl=post_data.get("imgUrl"),
         )
-        return HttpResponse("成功")
+        redata = {
+        'code': 200,
+        'msg': '创建商品',
+        'data': None
+        }
+        return HttpResponse(json.dumps(redata, indent=4))
     else:
-        post_data=request.POST;
+        post_data=request.POST
         shops.objects.create(price=request.POST.get("price"),
         title=post_data.get("title"),
         content=post_data.get("content"),
         seller_id=request.session.get("user_id"),
         imgUrl=request.get("imgUrl"),
         )
-    return HttpResponse("awdaw")
+        redata = {
+        'code': 200,
+        'msg': '创建商品',
+        'data': None
+        }
+        return HttpResponse(json.dumps(redata, indent=4))
 
 
 def createOrder(request):
     json_data = json.load(request.body)
     user_id = request.session.get("user_id")
+    id=time.strftime("%Y%m%d%H%M%S")
 
-
-    order.objects.create(order_id=time.strftime("%Y%m%d%H%M%S"), sellerAddress=json_data.get("sellerAddress"), sellerPhone=json_data.get("sellerPhone"),
+    order.objects.create(order_id=id, sellerAddress=json_data.get("sellerAddress"), sellerPhone=json_data.get("sellerPhone"),
     sellerName=json_data.get("sellerName"), seller_id=json_data.get("seller_id"), buyersAddress=json_data.get("buyersAddress"), buyersPhone=json_data.get("buyersPhone"),
     buyersName=json_data.get("buyersName"), buyers_id=json_data.get("buyers_id"))
 
     redata = {
         'code': 200,
-        'msg': '创建成功',
-        'data': None
+        'msg': '创建订单',
+        'data': {
+            'roder_id':id,
+        }
     }
     return HttpResponse(json.dumps(redata, indent=4))
 
+def orderList(request):
+    user_id=request.session.get("user_id")
+    if user_id==None:
+        return HttpResponse("未登陆")
+    else：
+        data = order.objects.filter(buyers_id=user_id)
+        redata = {
+        'code': 200,
+        'msg': '创建订单',
+        'data': {
+            
+        }
+    }
+        
 
+        
 def storeList(request):
     # json_data = json.load(request.body)
     # user_id = request.session.get("user_id")
